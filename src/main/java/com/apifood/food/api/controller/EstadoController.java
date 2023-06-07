@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/estados")
@@ -25,7 +26,7 @@ public class EstadoController {
     @GetMapping
     //(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}), especificando o tipo de objeto que retornata
     public List<Estado> listar(){
-        return estadoRepository.listaEstado();
+        return estadoRepository.findAll();
     }
 
     //@ResponseStatus(HttpStatus.OK)
@@ -39,7 +40,7 @@ public class EstadoController {
         //O ResponseEntity é frequentemente usado para retornar uma resposta HTTP personalizada de um controlador em um
         // aplicativo Spring Boot. Ao retornar um ResponseEntity em um controlador, você pode personalizar o código de status
         // HTTP, cabeçalhos e corpo da resposta.
-        Estado estado = estadoRepository.buscarPeloId(id);
+        Optional<Estado> estado = estadoRepository.findById(id);
 
         //**return ResponseEntity.status(HttpStatus.OK).body(cozinha);
         //Em um contexto de requisição HTTP, o termo "body" refere-se ao conteúdo que é enviado na parte inferior da mensagem
@@ -48,8 +49,8 @@ public class EstadoController {
         // Por exemplo, ao enviar uma solicitação POST para um servidor, o corpo da solicitação pode conter os dados que
         // estão sendo enviados para o servidor. Da mesma forma, ao receber uma resposta HTTP, o corpo da resposta pode conter
         // informações adicionais, como dados formatados em JSON ou XML.
-        if (estado != null){
-            return ResponseEntity.ok(estado);
+        if (estado.isPresent()){
+            return ResponseEntity.ok(estado.get());
         }
         //ResponseEntity.ok() é um método estático do ResponseEntity que retorna um objeto ResponseEntity com um código de
         // status HTTP 200 (OK) e nenhum corpo. Esse método é usado para indicar que uma solicitação HTTP foi bem-sucedida

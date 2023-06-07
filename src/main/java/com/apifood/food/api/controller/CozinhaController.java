@@ -7,14 +7,14 @@ import com.apifood.food.domain.repository.CozinhaRepository;
 import com.apifood.food.domain.service.CozinhaService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 // A anotação @RestController em uma aplicação Spring Boot é usada para criar um controlador (controller) que lida com
@@ -32,7 +32,7 @@ public class CozinhaController {
 
     @GetMapping //(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}), especificando o tipo de objeto que retornata
     public List<Cozinha> listar(){
-        return cozinhaRepository.listaCozinha();
+        return cozinhaRepository.findAll();
     }
 
     //@ResponseStatus(HttpStatus.OK)
@@ -46,21 +46,16 @@ public class CozinhaController {
         //O ResponseEntity é frequentemente usado para retornar uma resposta HTTP personalizada de um controlador em um
         // aplicativo Spring Boot. Ao retornar um ResponseEntity em um controlador, você pode personalizar o código de status
         // HTTP, cabeçalhos e corpo da resposta.
-        Cozinha cozinha = cozinhaRepository.buscarPeloId(id);
+        Optional<Cozinha> cozinha = cozinhaRepository.findById(id);
 
-        //**return ResponseEntity.status(HttpStatus.OK).body(cozinha);
-        //Em um contexto de requisição HTTP, o termo "body" refere-se ao conteúdo que é enviado na parte inferior da mensagem
-        // de solicitação ou resposta HTTP, após os cabeçalhos.
-        //O corpo da mensagem pode conter informações adicionais que são enviadas junto com a solicitação ou resposta.
-        // Por exemplo, ao enviar uma solicitação POST para um servidor, o corpo da solicitação pode conter os dados que
-        // estão sendo enviados para o servidor. Da mesma forma, ao receber uma resposta HTTP, o corpo da resposta pode conter
-        // informações adicionais, como dados formatados em JSON ou XML.
-        if (cozinha != null){
-            return ResponseEntity.ok(cozinha);
+//      Ao chamar o método .isPresent() no objeto cozinha, ele retorna true se o valor estiver presente e false caso contrário.
+        if (cozinha.isPresent()){
+
+            return ResponseEntity.ok(cozinha.get());
+            //ResponseEntity.ok() é um método estático do ResponseEntity que retorna um objeto ResponseEntity com um código de
+            // status HTTP 200 (OK) e nenhum corpo. Esse método é usado para indicar que uma solicitação HTTP foi bem-sucedida
+            // e não há erros ou problemas a serem relatados.
         }
-        //ResponseEntity.ok() é um método estático do ResponseEntity que retorna um objeto ResponseEntity com um código de
-        // status HTTP 200 (OK) e nenhum corpo. Esse método é usado para indicar que uma solicitação HTTP foi bem-sucedida
-        // e não há erros ou problemas a serem relatados.
 
         return ResponseEntity.notFound().build();
         //Caso nao tenha aquele id ele retonara esse status
@@ -79,6 +74,7 @@ public class CozinhaController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Transactional
     public Cozinha adicionar(@RequestBody Cozinha cozinha){
         /** Quando um cliente envia uma solicitação HTTP, ele pode enviar informações adicionais no corpo da solicitação,
          * além dos parâmetros da URL e dos cabeçalhos. Por exemplo, em uma solicitação POST ou PUT, os dados da solicitação
@@ -88,14 +84,16 @@ public class CozinhaController {
         return cozinhaService.salvar(cozinha);
     }
 
+    @Transactional
     @PutMapping("/{cozinhaId}")
     public ResponseEntity<Cozinha> atualizar(@PathVariable Long cozinhaId,
                                              @RequestBody Cozinha cozinha){
 
-        Cozinha cozinhaAtual = cozinhaRepository.buscarPeloId(cozinhaId);
-        if(cozinhaAtual != null){
+        Optional<Cozinha> cozinhaAtual = cozinhaRepository.findById(cozinhaId);
+
+        if(cozinhaAtual.isPresent()){
             //cozinhaAtual.setNome(cozinha.getNome());
-            BeanUtils.copyProperties(cozinha, cozinhaAtual, "id");
+            BeanUtils.copyProperties(cozinha, cozinhaAtual.get(), "id");
             /**
              * BeanUtils é uma classe da biblioteca Apache Commons BeanUtils que fornece um conjunto de métodos estáticos
              * para manipulação de propriedades de objetos Java por reflexão.
@@ -111,8 +109,8 @@ public class CozinhaController {
              * propriedades de um objeto de origem para um objeto de destino. O método faz uma cópia dos valores de todas as
              * propriedades correspondentes da origem para o destino.**/
 
-            cozinhaService.salvar(cozinhaAtual);
-            return ResponseEntity.ok(cozinhaAtual);
+            Cozinha cozinhaSalva = cozinhaService.salvar(cozinhaAtual.get());
+            return ResponseEntity.ok(cozinhaSalva);
         }
 
         return ResponseEntity.notFound().build();

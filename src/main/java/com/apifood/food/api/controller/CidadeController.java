@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/cidades")
@@ -25,7 +26,7 @@ public class CidadeController {
     @GetMapping
     //(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}), especificando o tipo de objeto que retornata
     public List<Cidade> listar(){
-        return cidadeRepository.listaCidade();
+        return cidadeRepository.findAll();
     }
 
     //@ResponseStatus(HttpStatus.OK)
@@ -33,10 +34,10 @@ public class CidadeController {
     // em caso de sucesso ao manipular uma determinada exceção.
     @GetMapping("/{cidadeId}")
     public ResponseEntity<Cidade> buscar(@PathVariable("cidadeId") Long id){
-        Cidade cidade = cidadeRepository.buscarPeloId(id);
+        Optional<Cidade> cidade = cidadeRepository.findById(id);
 
-        if (cidade != null){
-            return ResponseEntity.ok(cidade);
+        if (cidade.isPresent()){
+            return ResponseEntity.ok(cidade.get());
         }
 
         return ResponseEntity.notFound().build();
@@ -64,13 +65,13 @@ public class CidadeController {
     public ResponseEntity<?> atualizar(@PathVariable Long cidadeId,
                                        @RequestBody Cidade cidade){
         try {
-            Cidade cidadeAtual = cidadeRepository.buscarPeloId(cidadeId);
+            Optional<Cidade> cidadeAtual = cidadeRepository.findById(cidadeId);
 
-            if (cidadeAtual == null){
+            if (cidadeAtual.isEmpty()){
                 return ResponseEntity.notFound().build();
             }
 
-            Cidade cidadeAtualizado = cidadeService.atualizar(cidadeAtual, cidade);
+            Cidade cidadeAtualizado = cidadeService.atualizar(cidadeAtual.get(), cidade);
             return ResponseEntity.ok(cidadeAtualizado);
 
         }catch (EntidadeNaoEncontradaException e){

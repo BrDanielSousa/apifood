@@ -1,13 +1,10 @@
 package com.apifood.food.domain.repository;
 
 import com.apifood.food.domain.model.FormaPagamento;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
+@Repository
+public interface FormaPagamentoRepository extends JpaRepository<FormaPagamento, Long> {
 
-public interface FormaPagamentoRepository {
-
-    List<FormaPagamento> listaFormaPagamento();
-    FormaPagamento buscarPeloId(Long id);
-    FormaPagamento adicionar(FormaPagamento formaPagamento);
-    void remover(Long id);
 }

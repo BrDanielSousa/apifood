@@ -23,34 +23,31 @@ public class RestauranteService {
 
     public Restaurante salvar(Restaurante restaurante){
         Long cozinhaId = restaurante.getCozinha().getId();
-        Cozinha cozinha = cozinhaRepository.buscarPeloId(cozinhaId);
-
-        if (cozinha == null){
-            throw new EntidadeNaoEncontradaException(String.format("Nao existe cozinha com esse codigo %d", cozinhaId));
-        }
+        Cozinha cozinha = cozinhaRepository.findById(cozinhaId)
+                .orElseThrow(()-> new EntidadeNaoEncontradaException(String.format("Nao existe cozinha com esse codigo %d", cozinhaId)));
 
         restaurante.setCozinha(cozinha);
 
-        return restauranteRepository.adicionar(restaurante);
+        return restauranteRepository.save(restaurante);
     }
 
     public Restaurante atualizar(Restaurante restauranteAtual, Restaurante restaurante){
 
         Long cozinhaId = restaurante.getCozinha().getId();
-        Cozinha cozinha = cozinhaRepository.buscarPeloId(cozinhaId);
 
-        if (cozinha == null){
-            throw new EntidadeNaoEncontradaException(String.format("Nao existe cozinha com esse codigo %d", cozinhaId));
-        }
+        Cozinha cozinha = cozinhaRepository.findById(cozinhaId)
+                .orElseThrow(()-> new EntidadeNaoEncontradaException(String.format("Nao existe cozinha com esse codigo %d", cozinhaId)));
+
         restaurante.setCozinha(cozinha);
+
         BeanUtils.copyProperties(restaurante, restauranteAtual, "id");
 
-        return restauranteRepository.adicionar(restauranteAtual);
+        return restauranteRepository.save(restauranteAtual);
     }
 
     public void excluir(Long restauranteId){
         try {
-            restauranteRepository.remover(restauranteId);
+            restauranteRepository.deleteById(restauranteId);
         }catch(EmptyResultDataAccessException e){
             /**EmptyResultDataAccessException é uma exceção lançada pela camada de persistência de dados quando uma consulta SQL
              * resulta em zero resultados. Isso geralmente ocorre quando você está tentando buscar um objeto em um banco de dados

@@ -20,16 +20,13 @@ public class EstadoService {
     private EstadoRepository estadoRepository;
 
     public Estado salvar(Estado estado){
-        return estadoRepository.adicionar(estado);
+        return estadoRepository.save(estado);
     }
 
     public Estado atualizar(Estado estado, Long estadoId){
 
-        Estado estadoAtual = estadoRepository.buscarPeloId(estadoId);
-
-        if (estadoAtual == null){
-            throw new EntidadeNaoEncontradaException(String.format("Nao existe estado com esse codigo %d", estadoId));
-        }
+        Estado estadoAtual = estadoRepository.findById(estadoId)
+                .orElseThrow(()-> new EntidadeNaoEncontradaException(String.format("Nao existe estado com esse codigo %d", estadoId)));
 
         BeanUtils.copyProperties(estado, estadoAtual, "id");
         /**BeanUtils.copyProperties() é um método da biblioteca Apache Commons BeanUtils que permite copiar os valores das
@@ -43,7 +40,7 @@ public class EstadoService {
 
     public void excluir(Long estadoId){
         try {
-            estadoRepository.remover(estadoId);
+            estadoRepository.deleteById(estadoId);
         }catch(EmptyResultDataAccessException e){
             /**EmptyResultDataAccessException é uma exceção lançada pela camada de persistência de dados quando uma consulta SQL
              * resulta em zero resultados. Isso geralmente ocorre quando você está tentando buscar um objeto em um banco de dados
