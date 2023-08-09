@@ -1,9 +1,12 @@
 package com.apifood.food.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 // a anotação @Data é usada para gerar automaticamente os
@@ -28,4 +31,8 @@ public class Cozinha {
     // @JsonProperty("first_name") na propriedade firstName.
     @Column(nullable = false)
     private String nome;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "cozinha")
+    private List<Restaurante> restaurantes = new ArrayList();
 }

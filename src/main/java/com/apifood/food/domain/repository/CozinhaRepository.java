@@ -12,4 +12,12 @@ import java.util.List;
 //com um banco de dados.
 public interface CozinhaRepository extends JpaRepository<Cozinha, Long> {
 
+    //List<Cozinha> findByNomeContaining(String nome);
+    //findByNomeContaining: Esse é o nome do método de consulta. O prefixo findBy é uma convenção usada pelo Spring Data JPA para
+    //indicar que o método é uma consulta por atributo. Nesse caso, o atributo é nome. O sufixo Containing indica que a consulta
+    //buscará objetos cujo atributo nome contenha uma correspondência parcial com o valor fornecido.
+
+    //Optional<Cozinha> findByNome(String nome);
+
+    //boolean existsByNome(String nome); true ou false
 }

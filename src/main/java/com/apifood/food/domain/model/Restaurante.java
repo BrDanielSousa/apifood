@@ -5,6 +5,8 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 // a anotação @Data é usada para gerar automaticamente os
@@ -32,4 +34,11 @@ public class Restaurante {
     @ManyToOne
     @JoinColumn(nullable = false) //renomear o nome do campo da relação
     private Cozinha cozinha;
+
+    @ManyToMany
+    @JoinTable(name = "restaurante_forma_pagamento",
+                joinColumns = @JoinColumn(name = "restaurante_id"),
+                inverseJoinColumns = @JoinColumn(name = "forma_pagamento_id"))
+    private List<FormaPagamento> formaPagamentos = new ArrayList<>();
+
 }

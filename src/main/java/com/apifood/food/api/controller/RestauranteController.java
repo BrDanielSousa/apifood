@@ -2,6 +2,7 @@ package com.apifood.food.api.controller;
 
 import com.apifood.food.domain.exception.EntidadeEmUsoException;
 import com.apifood.food.domain.exception.EntidadeNaoEncontradaException;
+import com.apifood.food.domain.model.Cozinha;
 import com.apifood.food.domain.model.Restaurante;
 import com.apifood.food.domain.repository.RestauranteRepository;
 import com.apifood.food.domain.service.RestauranteService;
@@ -13,6 +14,7 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -128,5 +130,11 @@ public class RestauranteController {
         }catch(EntidadeEmUsoException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
+    }
+
+    @GetMapping("/teste")
+    public List<Restaurante> teste(String nome, BigDecimal taxaInicial, BigDecimal taxaFinal){
+        List<Restaurante> testes = restauranteRepository.find(nome, taxaInicial, taxaFinal);
+        return testes;
     }
 }

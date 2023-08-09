@@ -40,7 +40,7 @@ public class RestauranteService {
 
         restaurante.setCozinha(cozinha);
 
-        BeanUtils.copyProperties(restaurante, restauranteAtual, "id");
+        BeanUtils.copyProperties(restaurante, restauranteAtual, "id", "formaPagamentos");
 
         return restauranteRepository.save(restauranteAtual);
     }
