@@ -1,10 +1,14 @@
 package com.apifood.food.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +39,19 @@ public class Restaurante {
     @JoinColumn(nullable = false) //renomear o nome do campo da relação
     private Cozinha cozinha;
 
+    @JsonIgnore
+    @Embedded
+    private Endereco endereco;
+
+    @CreationTimestamp
+    @Column(nullable = false, columnDefinition = "timestamp")
+    private LocalDateTime dataCadastro;
+
+    @UpdateTimestamp
+    @Column(nullable = false, columnDefinition = "timestamp")//Nao posso usar o datatime pq e do mysql
+    private LocalDateTime dataAtualizacao;
+
+    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "restaurante_forma_pagamento",
                 joinColumns = @JoinColumn(name = "restaurante_id"),
